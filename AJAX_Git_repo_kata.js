@@ -8,16 +8,19 @@ input.addEventListener(
   debounce(async () => {
     const value = input.value.trim();
     if (value) {
-      const repositories = await getRepos(value);
+      try {
+        const repositories = await getRepos(value);
+        db = repositories;
 
-      db = repositories;
+        dropdown.innerHTML = "";
 
-      dropdown.innerHTML = "";
-
-      repositories.forEach((el) => {
-        let newItem = createMenuItem(el);
-        dropdown.append(newItem);
-      });
+        repositories.forEach((el) => {
+          let newItem = createMenuItem(el);
+          dropdown.append(newItem);
+        });
+      } catch (error) {
+        console.log(`Возникла ошибка при запросе данных `, error.name);
+      }
     } else {
       dropdown.innerHTML = "";
     }
@@ -51,7 +54,7 @@ async function getRepos(name) {
     const repos = data.items;
     return repos;
   } else {
-    alert("Превышено допустимое количество запросов " + response.status);
+    alert("При запросе данных произошла ошибка" + response.status);
   }
 }
 function debounce(fn, debounceTime) {
@@ -85,7 +88,8 @@ function createCard(searchObj) {
   owner.textContent = `Owner: ${searchObj.owner.login}`;
   const stars = document.createElement("p");
   stars.textContent = `Stars: ${searchObj.stargazers_count}`;
-  const deleteBtn = document.createElement("span");
+  // const deleteBtn = document.createElement("span");
+  const deleteBtn = document.createElement("buton");
   deleteBtn.classList.add("btn-delete");
 
   card.append(name, owner, stars, deleteBtn);
